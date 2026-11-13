@@ -1,0 +1,22 @@
+# Data Quality Report
+
+## 1. Dataset Overview
+* **Raw File:** `data/raw/ecommerce_orders_raw.csv`
+* **Cleaned File:** `data/processed/ecommerce_orders_cleaned.csv`
+* **Columns:** 16 attributes covering order details, customer demographics, product pricing, and delivery metrics.
+* **Data Readiness:** 100% of duplicate records removed and all missing or invalid entries resolved prior to analysis.
+
+## 2. Summary of Data Quality Issues & Resolutions
+
+| Issue Category                 | Affected Columns                                                                                                                  | Anomaly Description                                                                                                                                  | Resolution Applied                                                                                                                                                                                |
+|:-------------------------------|:----------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Duplicate Records**          | All columns (`Order_ID`)                                                                                                          | Exact duplicate rows inflated order counts and total revenue.                                                                                        | Removed exact duplicate records using `drop_duplicates()`.                                                                                                                                        |
+| **Missing Values**             | `Customer_Age`, `Gender`, `City`, `State`, `Product_Name`, `Unit_Price`, `Discount_Percentage`, `Payment_Method`, `Shipping_Days` | Null values occurred across customer demographics, product details, and order metrics.                                                               | Recovered missing customer and product attributes via `Customer_ID` and `Product_ID` lookups; calculated missing discounts mathematically; imputed remaining fields with group medians and modes. |
+| **Inconsistent Text & Casing** | `Gender`, `City`, `State`, `Category`, `Payment_Method`, `Order_Status`                                                           | Mixed capitalization (`upi`, `UPI`), abbreviations (`M`, `F`, `COD`, `U.P.`), and legacy city names (`Calcutta`, `Bombay`, `Madras`, `Bangalore`).   | Standardized casing with `.str.title()` and mapped variants to uniform labels (`Kolkata`, `Mumbai`, `Chennai`, `Bengaluru`, `Cash On Delivery`).                                                  |
+| **Date Formatting & Typos**    | `Order_Date`                                                                                                                      | Mixed date formats (`YYYY-MM-DD`, `DD-MM-YYYY`, `DD Mon YYYY`), invalid calendar dates (`2025-02-30`, `2025-06-31`), and future year typos (`2052`). | Parsed mixed formats via `pd.to_datetime(..., format='mixed')` and corrected year typos back to `2025`.                                                                                           |
+| **Outliers & Invalid Values**  | `Customer_Age`, `Unit_Price`, `Shipping_Days`                                                                                     | Impossible ages (`5`, `199`), 10x price entry typos (e.g., `7990` instead of `799`), and missing shipping days on cancelled orders.                  | Capped valid age range (18–100), standardized `Unit_Price` using per-product median price, and set `Shipping_Days` to `0` for `Cancelled` and `Pending` orders.                                   |
+
+## 3. Data Integrity Verification
+* **Null Check:** Confirmed `0` remaining missing values across all 16 columns.
+* **Data Types:** Verified numerical fields (`Customer_Age`, `Quantity`, `Unit_Price`, `Discount_Percentage`, `Shipping_Days`, `Total_Sales`) are properly typed as `int64` or `float64`, and `Order_Date` is typed as `datetime64[ns]`.
+* **Business Logic Check:** Verified that `Total_Sales` aligns with `Unit_Price × Quantity × (1 - Discount_Percentage / 100)` across all valid rows.
