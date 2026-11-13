@@ -76,6 +76,5 @@ Detailed analytical conclusions and data quality logs can be found in the `repor
 ---
 
 ## 👤 Author
-**Aziz Chharchhodawala**  
-Data Analytics Intern at CodeAlpha  
-[![LinkedIn](https://shields.io)](hwww.linkedin.com/in/aziz-chharchhodawala)
+**Aziz Chharchhodawala**    
+🔗 LinkedIn: [www.linkedin.com/in/aziz-chharchhodawala](https://linkedin.com)
